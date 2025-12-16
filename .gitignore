@@ -1,0 +1,7 @@
+*.o
+
+pbrain-gomoku-ai
+
+.zed/
+.vscode/
+.DS_Store
