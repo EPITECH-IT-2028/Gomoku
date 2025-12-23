@@ -54,6 +54,22 @@ class Gomoku {
       _timeLeft = timeLeft;
     }
 
+    int getTimeoutTurn() const {
+      return _timeoutTurn;
+    }
+
+    int getTimeoutMatch() const {
+      return _timeoutMatch;
+    }
+
+    int getMaxMemory() const {
+      return _maxMemory;
+    }
+
+    int getTimeLeft() const {
+      return _timeLeft;
+    }
+
   private:
     int _width;
     int _height;

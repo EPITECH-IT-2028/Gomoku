@@ -7,7 +7,12 @@ Commands::Commands() : _running(true) {
 void Commands::run() {
   std::string input;
   while (_running && std::getline(std::cin, input)) {
-    input.erase(input.find_last_not_of(" \n\r\t") + 1);
+    size_t end = input.find_last_not_of(" \n\r\t");
+    if (end != std::string::npos) {
+      input.erase(end + 1);
+    } else {
+      input.clear();
+    }
     if (!input.empty()) {
       handleCommand(input);
     }
