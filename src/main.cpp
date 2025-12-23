@@ -1,13 +1,14 @@
 #include <exception>
 #include <iostream>
+#include "Commands.hpp"
 #include "Macro.h"
 
-int main(int ac, char **av) {
+int main(void) {
   try {
-    std::cout << "Gomoku game started with " << ac << " arguments."
-              << std::endl;
+    Commands commands;
+    commands.run();
   } catch (const std::exception &e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+    std::cerr << "ERROR " << e.what() << std::endl;
     return FAILURE;
   }
   return SUCCESS;
