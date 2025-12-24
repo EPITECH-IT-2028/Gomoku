@@ -3,7 +3,9 @@ NAME = pbrain-gomoku-ai
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++20
 
-SRC += src/main.cpp
+SRC += src/main.cpp \
+		src/Gomoku.cpp \
+		src/Commands.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 

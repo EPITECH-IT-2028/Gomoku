@@ -4,4 +4,7 @@ pbrain-gomoku-ai
 
 .zed/
 .vscode/
+.cache/
 .DS_Store
+
+compile_commands.json
