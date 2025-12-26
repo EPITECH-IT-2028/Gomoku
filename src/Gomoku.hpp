@@ -1,10 +1,14 @@
 #pragma once
 
+#include "Macro.h"
+#include <vector>
+
 class Gomoku {
   public:
     Gomoku()
         : _width(0),
           _height(0),
+          _begin(false),
           _initialized(false),
           _timeoutTurn(0),
           _timeoutMatch(0),
@@ -13,6 +17,19 @@ class Gomoku {
     }
 
     ~Gomoku() = default;
+
+    int start(int size);
+
+    void initializeBoard();
+    void updateBoard(const Move &move, Player player);
+
+    bool isValid(const Move &move) const;
+    bool isOnBoard(const Move &move) const;
+
+    Move getBestMove();
+    int evaluate();
+    int negamax(int depth, int alpha, int beta, Player player);
+    std::vector<Move> generateMoves();
 
     void setWidth(int width) {
       _width = width;
@@ -70,9 +87,16 @@ class Gomoku {
       return _timeLeft;
     }
 
+    void setBegin(bool begin) {
+      _begin = begin;
+    }
+
   private:
+    std::vector<std::vector<Player>> _board;
+
     int _width;
     int _height;
+    bool _begin;
     bool _initialized;
     int _timeoutTurn;
     int _timeoutMatch;
