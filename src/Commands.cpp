@@ -1,4 +1,5 @@
 #include "Commands.hpp"
+#include "Macro.h"
 #include <iostream>
 
 Commands::Commands() : _running(true) {
@@ -64,7 +65,12 @@ void Commands::handleAbout(const std::string &args) {
 }
 
 void Commands::handleStart(const std::string &args) {
-  (void)args;
+  int size = std::stoi(args);
+  if (_game.start(size) == FAILURE) {
+    std::cout << "ERROR message - unsupported size or other error" << std::endl;
+    return;
+  }
+  std::cout << "OK - everything is good" << std::endl;
 }
 
 void Commands::handleRectStart(const std::string &args) {
@@ -77,10 +83,27 @@ void Commands::handleRestart(const std::string &args) {
 
 void Commands::handleBegin(const std::string &args) {
   (void)args;
+
+  _game.setBegin(true);
+  Move move = _game.getBestMove();
+  std::cout << move.x << "," << move.y << std::endl;
 }
 
 void Commands::handleTurn(const std::string &args) {
   (void)args;
+
+  size_t commaPos = args.find(',');
+  if (commaPos == std::string::npos) {
+    std::cout << "ERROR message - invalid move format" << std::endl;
+    return;
+  }
+
+  int x = std::stoi(args.substr(0, commaPos));
+  int y = std::stoi(args.substr(commaPos + 1));
+
+  _game.updateBoard({x, y}, OPPONENT);
+  Move move = _game.getBestMove();
+  std::cout << move.x << "," << move.y << std::endl;
 }
 
 void Commands::handleBoard(const std::string &args) {
