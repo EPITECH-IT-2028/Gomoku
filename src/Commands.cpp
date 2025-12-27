@@ -67,12 +67,19 @@ void Commands::handleAbout(const std::string &args) {
 }
 
 void Commands::handleStart(const std::string &args) {
-  int size = std::stoi(args);
-  if (_game.start(size) == FAILURE) {
+  try {
+    int size = std::stoi(args);
+
+    if (_game.start(size) == FAILURE) {
+      std::cout << "ERROR message - unsupported size or other error" << std::endl;
+      return;
+    }
+
+    std::cout << "OK - everything is good" << std::endl;
+  } catch (const std::exception &e) {
     std::cout << "ERROR message - unsupported size or other error" << std::endl;
     return;
-  }
-  std::cout << "OK - everything is good" << std::endl;
+  }   
 }
 
 void Commands::handleRectStart(const std::string &args) {
@@ -82,15 +89,20 @@ void Commands::handleRectStart(const std::string &args) {
     return;
   }
 
-  int width = std::stoi(args.substr(0, commaPos));
-  int height = std::stoi(args.substr(commaPos + 1));
+  try {
+    int width = std::stoi(args.substr(0, commaPos));
+    int height = std::stoi(args.substr(commaPos + 1));
 
-  if (_game.rectStart(width, height) == FAILURE) {
+    if (_game.rectStart(width, height) == FAILURE) {
+      std::cout << "ERROR message - rectangular board is not supported or other error" << std::endl;
+      return;
+    }
+
+    std::cout << "OK - parameters are good" << std::endl;
+  } catch (const std::exception &e) {
     std::cout << "ERROR message - rectangular board is not supported or other error" << std::endl;
     return;
   }
-
-  std::cout << "OK - parameters are good" << std::endl;
 }
 
 void Commands::handleRestart(const std::string &args) {
@@ -115,12 +127,17 @@ void Commands::handleTurn(const std::string &args) {
     return;
   }
 
-  int x = std::stoi(args.substr(0, commaPos));
-  int y = std::stoi(args.substr(commaPos + 1));
+  try {
+    int x = std::stoi(args.substr(0, commaPos));
+    int y = std::stoi(args.substr(commaPos + 1));
 
-  _game.updateBoard({x, y}, OPPONENT);
-  Move move = _game.getBestMove();
-  std::cout << move.x << "," << move.y << std::endl;
+    _game.updateBoard({x, y}, OPPONENT);
+    Move move = _game.getBestMove();
+    std::cout << move.x << "," << move.y << std::endl;
+  } catch (const std::exception &e) {
+    std::cout << "ERROR message - invalid move format" << std::endl;
+    return;
+  }
 }
 
 void Commands::handleBoard(const std::string &args) {
@@ -135,16 +152,21 @@ void Commands::handleBoard(const std::string &args) {
       break;
     }
 
-    size_t comaPos1 = line.find(',');
-    size_t comaPos2 = line.find(',', comaPos1 + 1);
+    size_t commaPos1 = line.find(',');
+    size_t commaPos2 = line.find(',', commaPos1 + 1);
 
-    if (comaPos1 != std::string::npos && comaPos2 != std::string::npos) {
-      int x = std::stoi(line.substr(0, comaPos1));
-      int y = std::stoi(line.substr(comaPos1 + 1, comaPos2 - comaPos1 - 1));
-      int p = std::stoi(line.substr(comaPos2 + 1));
+    if (commaPos1 != std::string::npos && commaPos2 != std::string::npos) {
+      try {
+        int x = std::stoi(line.substr(0, commaPos1));
+        int y = std::stoi(line.substr(commaPos1 + 1, commaPos2 - commaPos1 - 1));
+        int p = std::stoi(line.substr(commaPos2 + 1));
 
-      Player player = (p == 1) ? ME : OPPONENT;
-      _game.updateBoard({x, y}, player);
+        Player player = (p == 1) ? ME : OPPONENT;
+        _game.updateBoard({x, y}, player);
+      } catch (const std::exception &e) {
+        std::cout << "ERROR message - invalid board move format" << std::endl;
+        continue;
+      }
     }
   }
 }
