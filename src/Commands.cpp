@@ -81,6 +81,9 @@ void Commands::handleRectStart(const std::string &args) {
 
 void Commands::handleRestart(const std::string &args) {
   (void)args;
+
+  _game.restart();
+  std::cout << "OK" << std::endl;
 }
 
 void Commands::handleBegin(const std::string &args) {
