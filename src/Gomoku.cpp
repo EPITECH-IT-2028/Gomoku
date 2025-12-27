@@ -136,6 +136,8 @@ int Gomoku::evaluate() {
 
       Player currentPlayer = _board[x][y];
 
+      int multiplicator = (currentPlayer == ME) ? 1 : -1;
+
       for (int dir = 0; dir < 4; dir++) {
         int prevX = x - dx[dir];
         int prevY = y - dy[dir];
@@ -155,13 +157,13 @@ int Gomoku::evaluate() {
         }
 
         if (count >= 5) {
-          score += 10000;
+          score += 10000 * multiplicator;
         } else if (count == 4) {
-          score += 1000;
+          score += 1000 * multiplicator;
         } else if (count == 3) {
-          score += 100;
+          score += 100 * multiplicator;
         } else if (count == 2) {
-          score += 10;
+          score += 10 * multiplicator;
         }
       }
     }
