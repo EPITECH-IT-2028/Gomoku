@@ -19,6 +19,7 @@ class Gomoku {
     ~Gomoku() = default;
 
     int start(int size);
+    int rectStart(int width, int height);
     void restart();
 
     void initializeBoard();

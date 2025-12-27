@@ -76,7 +76,21 @@ void Commands::handleStart(const std::string &args) {
 }
 
 void Commands::handleRectStart(const std::string &args) {
-  (void)args;
+  size_t commaPos = args.find(',');
+  if (commaPos == std::string::npos) {
+    std::cout << "ERROR message - rectangular board is not supported or other error" << std::endl;
+    return;
+  }
+
+  int width = std::stoi(args.substr(0, commaPos));
+  int height = std::stoi(args.substr(commaPos + 1));
+
+  if (_game.rectStart(width, height) == FAILURE) {
+    std::cout << "ERROR message - rectangular board is not supported or other error" << std::endl;
+    return;
+  }
+
+  std::cout << "OK - parameters are good" << std::endl;
 }
 
 void Commands::handleRestart(const std::string &args) {
@@ -95,8 +109,6 @@ void Commands::handleBegin(const std::string &args) {
 }
 
 void Commands::handleTurn(const std::string &args) {
-  (void)args;
-
   size_t commaPos = args.find(',');
   if (commaPos == std::string::npos) {
     std::cout << "ERROR message - invalid move format" << std::endl;
