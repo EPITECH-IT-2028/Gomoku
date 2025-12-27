@@ -20,7 +20,7 @@ void Gomoku::initializeBoard() {
 }
 
 bool Gomoku::isValid(const Move &move) const {
-  return move.x >= 0 && move.x < _width && move.y >= 0 && move.y < _height && _board[move.y][move.x] == NONE;
+  return move.x >= 0 && move.x < _width && move.y >= 0 && move.y < _height && _board[move.x][move.y] == NONE;
 }
 
 bool Gomoku::isOnBoard(const Move &move) const {
@@ -77,7 +77,7 @@ std::vector<Move> Gomoku::generateMoves() {
       for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
           if (dx == 0 && dy == 0) continue;
-          if (isOnBoard({dx, dy}) && _board[dx][dy] != NONE) {
+          if (isOnBoard({x + dx, y + dy}) && _board[y + dy][x + dx] != NONE) {
             hasNeighbor = true;
             break;
           }
