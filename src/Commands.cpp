@@ -1,6 +1,8 @@
 #include "Commands.hpp"
 #include "Macro.h"
+#include <cstddef>
 #include <iostream>
+#include <string>
 
 Commands::Commands() : _running(true) {
 }
@@ -108,6 +110,28 @@ void Commands::handleTurn(const std::string &args) {
 
 void Commands::handleBoard(const std::string &args) {
   (void)args;
+
+  std::string line;
+
+  while (_running && std::getline(std::cin, line)) {
+    if (line == "DONE") {
+      Move move = _game.getBestMove();
+      std::cout << move.x << "," << move.y << std::endl;
+      break;
+    }
+
+    size_t comaPos1 = line.find(',');
+    size_t comaPos2 = line.find(',', comaPos1 + 1);
+
+    if (comaPos1 != std::string::npos && comaPos2 != std::string::npos) {
+      int x = std::stoi(line.substr(0, comaPos1));
+      int y = std::stoi(line.substr(comaPos1 + 1, comaPos2 - comaPos1 - 1));
+      int p = std::stoi(line.substr(comaPos2 + 1));
+
+      Player player = (p == 1) ? ME : OPPONENT;
+      _game.updateBoard({x, y}, player);
+    }
+  }
 }
 
 void Commands::handleInfo(const std::string &args) {
