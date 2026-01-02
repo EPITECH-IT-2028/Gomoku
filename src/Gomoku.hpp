@@ -19,6 +19,8 @@ class Gomoku {
     ~Gomoku() = default;
 
     int start(int size);
+    int rectStart(int width, int height);
+    void restart();
 
     void initializeBoard();
     void updateBoard(const Move &move, Player player);

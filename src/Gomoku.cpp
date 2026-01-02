@@ -14,6 +14,22 @@ int Gomoku::start(int size) {
   return SUCCESS;
 }
 
+int Gomoku::rectStart(int width, int height) {
+  if (width <= 0 || height <= 0) {
+    return FAILURE;
+  }
+
+  _width = width;
+  _height = height;
+  initializeBoard();
+  return SUCCESS;
+}
+
+void Gomoku::restart() {
+  _board.clear();
+  initializeBoard();
+}
+
 void Gomoku::initializeBoard() {
   _board.assign(_width, std::vector<Player>(_height, NONE));
   _initialized = true;
