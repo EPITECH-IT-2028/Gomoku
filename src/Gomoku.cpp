@@ -36,7 +36,7 @@ void Gomoku::initializeBoard() {
 }
 
 bool Gomoku::isValid(const Move &move) const {
-  return move.x >= 0 && move.x < _width && move.y >= 0 && move.y < _height && _board[move.y][move.x] == NONE;
+  return move.x >= 0 && move.x < _width && move.y >= 0 && move.y < _height && _board[move.x][move.y] == NONE;
 }
 
 bool Gomoku::isOnBoard(const Move &move) const {
@@ -93,7 +93,7 @@ std::vector<Move> Gomoku::generateMoves() {
       for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
           if (dx == 0 && dy == 0) continue;
-          if (isOnBoard({dx, dy}) && _board[dx][dy] != NONE) {
+          if (isOnBoard({x + dx, y + dy}) && _board[y + dy][x + dx] != NONE) {
             hasNeighbor = true;
             break;
           }
@@ -152,6 +152,8 @@ int Gomoku::evaluate() {
 
       Player currentPlayer = _board[x][y];
 
+      int multiplicator = (currentPlayer == ME) ? 1 : -1;
+
       for (int dir = 0; dir < 4; dir++) {
         int prevX = x - dx[dir];
         int prevY = y - dy[dir];
@@ -171,13 +173,13 @@ int Gomoku::evaluate() {
         }
 
         if (count >= 5) {
-          score += 10000;
+          score += 10000 * multiplicator;
         } else if (count == 4) {
-          score += 1000;
+          score += 1000 * multiplicator;
         } else if (count == 3) {
-          score += 100;
+          score += 100 * multiplicator;
         } else if (count == 2) {
-          score += 10;
+          score += 10 * multiplicator;
         }
       }
     }
