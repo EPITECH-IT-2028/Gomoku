@@ -54,9 +54,15 @@ Move Gomoku::getBestMove() {
   std::vector<Move> moves;
 
   if (_begin) {
-    moves = generateMoves();
-  } else {
+    _begin = false;
+    updateBoard({_width / 2, _height / 2}, ME);
     return {_width / 2, _height / 2};
+  }
+
+  moves = generateMoves();
+  
+  if (moves.empty()) {
+    return {-1, -1};
   }
 
   Move bestMove = moves[0];
