@@ -55,10 +55,15 @@ Move Gomoku::getBestMove() {
 
   if (_begin) {
     _begin = false;
+    updateBoard({_width / 2, _height / 2}, ME);
     return {_width / 2, _height / 2};
   }
 
   moves = generateMoves();
+  
+  if (moves.empty()) {
+    return {-1, -1};
+  }
 
   Move bestMove = moves[0];
   int bestValue = std::numeric_limits<int>::min();
