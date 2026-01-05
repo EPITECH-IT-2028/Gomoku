@@ -54,10 +54,11 @@ Move Gomoku::getBestMove() {
   std::vector<Move> moves;
 
   if (_begin) {
-    moves = generateMoves();
-  } else {
+    _begin = false;
     return {_width / 2, _height / 2};
   }
+
+  moves = generateMoves();
 
   Move bestMove = moves[0];
   int bestValue = std::numeric_limits<int>::min();
