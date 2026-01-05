@@ -1,8 +1,8 @@
 #include "Commands.hpp"
-#include "Macro.h"
 #include <cstddef>
 #include <iostream>
 #include <string>
+#include "Macro.h"
 
 Commands::Commands() : _running(true) {
 }
@@ -71,21 +71,22 @@ void Commands::handleStart(const std::string &args) {
     int size = std::stoi(args);
 
     if (_game.start(size) == FAILURE) {
-      std::cout << "ERROR message - unsupported size or other error" << std::endl;
+      std::cout << "ERROR unsupported size or other error" << std::endl;
       return;
     }
 
-    std::cout << "OK - everything is good" << std::endl;
+    std::cout << "OK" << std::endl;
   } catch (const std::exception &e) {
-    std::cout << "ERROR message - unsupported size or other error" << std::endl;
+    std::cout << "ERROR unsupported size or other error" << std::endl;
     return;
-  }   
+  }
 }
 
 void Commands::handleRectStart(const std::string &args) {
   size_t commaPos = args.find(',');
   if (commaPos == std::string::npos) {
-    std::cout << "ERROR message - rectangular board is not supported or other error" << std::endl;
+    std::cout << "ERROR rectangular board is not supported or other error"
+              << std::endl;
     return;
   }
 
@@ -94,13 +95,15 @@ void Commands::handleRectStart(const std::string &args) {
     int height = std::stoi(args.substr(commaPos + 1));
 
     if (_game.rectStart(width, height) == FAILURE) {
-      std::cout << "ERROR message - rectangular board is not supported or other error" << std::endl;
+      std::cout << "ERROR rectangular board is not supported or other error"
+                << std::endl;
       return;
     }
 
-    std::cout << "OK - parameters are good" << std::endl;
+    std::cout << "OK" << std::endl;
   } catch (const std::exception &e) {
-    std::cout << "ERROR message - rectangular board is not supported or other error" << std::endl;
+    std::cout << "ERROR rectangular board is not supported or other error"
+              << std::endl;
     return;
   }
 }
@@ -123,7 +126,7 @@ void Commands::handleBegin(const std::string &args) {
 void Commands::handleTurn(const std::string &args) {
   size_t commaPos = args.find(',');
   if (commaPos == std::string::npos) {
-    std::cout << "ERROR message - invalid move format" << std::endl;
+    std::cout << "ERROR invalid move format" << std::endl;
     return;
   }
 
@@ -135,7 +138,7 @@ void Commands::handleTurn(const std::string &args) {
     Move move = _game.getBestMove();
     std::cout << move.x << "," << move.y << std::endl;
   } catch (const std::exception &e) {
-    std::cout << "ERROR message - invalid move format" << std::endl;
+    std::cout << "ERROR invalid move format" << std::endl;
     return;
   }
 }
@@ -158,13 +161,14 @@ void Commands::handleBoard(const std::string &args) {
     if (commaPos1 != std::string::npos && commaPos2 != std::string::npos) {
       try {
         int x = std::stoi(line.substr(0, commaPos1));
-        int y = std::stoi(line.substr(commaPos1 + 1, commaPos2 - commaPos1 - 1));
+        int y =
+            std::stoi(line.substr(commaPos1 + 1, commaPos2 - commaPos1 - 1));
         int p = std::stoi(line.substr(commaPos2 + 1));
 
         Player player = (p == 1) ? ME : OPPONENT;
         _game.updateBoard({x, y}, player);
       } catch (const std::exception &e) {
-        std::cout << "ERROR message - invalid board move format" << std::endl;
+        std::cout << "ERROR invalid board move format" << std::endl;
         continue;
       }
     }

@@ -1,7 +1,7 @@
 #include "Gomoku.hpp"
-#include "Macro.h"
 #include <limits>
 #include <vector>
+#include "Macro.h"
 
 int Gomoku::start(int size) {
   if (size <= 0) {
@@ -36,7 +36,8 @@ void Gomoku::initializeBoard() {
 }
 
 bool Gomoku::isValid(const Move &move) const {
-  return move.x >= 0 && move.x < _width && move.y >= 0 && move.y < _height && _board[move.x][move.y] == NONE;
+  return move.x >= 0 && move.x < _width && move.y >= 0 && move.y < _height &&
+         _board[move.x][move.y] == NONE;
 }
 
 bool Gomoku::isOnBoard(const Move &move) const {
@@ -45,7 +46,7 @@ bool Gomoku::isOnBoard(const Move &move) const {
 
 void Gomoku::updateBoard(const Move &move, Player player) {
   if (isValid(move)) {
-      _board[move.x][move.y] = player;
+    _board[move.x][move.y] = player;
   }
 }
 
@@ -55,7 +56,7 @@ Move Gomoku::getBestMove() {
   if (_begin) {
     moves = generateMoves();
   } else {
-    return { _width / 2, _height / 2 };
+    return {_width / 2, _height / 2};
   }
 
   Move bestMove = moves[0];
@@ -87,18 +88,21 @@ std::vector<Move> Gomoku::generateMoves() {
 
   for (int x = 0; x < _width; x++) {
     for (int y = 0; y < _height; y++) {
-      if (_board[x][y] == NONE) continue;
+      if (_board[x][y] == NONE)
+        continue;
 
       bool hasNeighbor = false;
       for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
-          if (dx == 0 && dy == 0) continue;
+          if (dx == 0 && dy == 0)
+            continue;
           if (isOnBoard({x + dx, y + dy}) && _board[y + dy][x + dx] != NONE) {
             hasNeighbor = true;
             break;
           }
         }
-        if (hasNeighbor) break;
+        if (hasNeighbor)
+          break;
       }
       if (hasNeighbor) {
         moves.push_back({x, y});
@@ -115,14 +119,16 @@ int Gomoku::negamax(int depth, int alpha, int beta, Player player) {
   }
 
   std::vector<Move> moves = generateMoves();
-  if (moves.empty()) return (player == ME) ? evaluate() : -evaluate();
+  if (moves.empty())
+    return (player == ME) ? evaluate() : -evaluate();
 
   int bestValue = std::numeric_limits<int>::min();
 
   for (const auto &move : moves) {
     _board[move.x][move.y] = player;
 
-    int val = -negamax(depth - 1, -beta, -alpha, (player == ME) ? OPPONENT : ME);
+    int val =
+        -negamax(depth - 1, -beta, -alpha, (player == ME) ? OPPONENT : ME);
 
     _board[move.x][move.y] = NONE;
 
@@ -148,7 +154,8 @@ int Gomoku::evaluate() {
 
   for (int x = 0; x < _width; x++) {
     for (int y = 0; y < _height; y++) {
-      if (_board[x][y] == NONE) continue;
+      if (_board[x][y] == NONE)
+        continue;
 
       Player currentPlayer = _board[x][y];
 
@@ -158,7 +165,8 @@ int Gomoku::evaluate() {
         int prevX = x - dx[dir];
         int prevY = y - dy[dir];
 
-        if (isOnBoard({prevX, prevY}) && _board[prevX][prevY] == currentPlayer) {
+        if (isOnBoard({prevX, prevY}) &&
+            _board[prevX][prevY] == currentPlayer) {
           continue;
         }
 
@@ -166,7 +174,8 @@ int Gomoku::evaluate() {
         int currX = x;
         int currY = y;
 
-        while (isOnBoard({currX, currY}) && _board[currX][currY] == currentPlayer) {
+        while (isOnBoard({currX, currY}) &&
+               _board[currX][currY] == currentPlayer) {
           count++;
           currX += dx[dir];
           currY += dy[dir];
