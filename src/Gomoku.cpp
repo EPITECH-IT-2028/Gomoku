@@ -185,8 +185,6 @@ std::vector<Move> Gomoku::generateMoves() {
 int Gomoku::negamax(int depth, int alpha, int beta, Player player) {
   if (depth == 0) {
     int score = evaluate();
-    if (score > 900000) score -= (MAX_DEPTH - depth); 
-    if (score < -900000) score += (MAX_DEPTH - depth);
     return (player == ME) ? score : -score;
   }
 
