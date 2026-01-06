@@ -120,14 +120,14 @@ Move Gomoku::getBestMove() {
   }
 
   Move bestMove = moves[0];
-  int bestValue = std::numeric_limits<int>::min();
-  int alpha = std::numeric_limits<int>::min();
-  int beta = std::numeric_limits<int>::max();
+  long long bestValue = std::numeric_limits<long long>::min();
+  long long alpha = std::numeric_limits<long long>::min();
+  long long beta = std::numeric_limits<long long>::max();
 
   for (const auto &move : moves) {
     _board[move.x][move.y] = ME;
 
-    int val = -negamax(MAX_DEPTH - 1, -beta, -alpha, OPPONENT);
+    long long val = -negamax(MAX_DEPTH - 1, -beta, -alpha, OPPONENT);
 
     _board[move.x][move.y] = NONE;
 
@@ -182,9 +182,9 @@ std::vector<Move> Gomoku::generateMoves() {
   return moves;
 }
 
-int Gomoku::negamax(int depth, int alpha, int beta, Player player) {
+long long Gomoku::negamax(int depth, long long alpha, long long beta, Player player) {
   if (depth == 0) {
-    int score = evaluate();
+    long long score = evaluate();
     return (player == ME) ? score : -score;
   }
 
@@ -192,12 +192,12 @@ int Gomoku::negamax(int depth, int alpha, int beta, Player player) {
   if (moves.empty())
     return (player == ME) ? evaluate() : -evaluate();
 
-  int bestValue = std::numeric_limits<int>::min();
+  long long bestValue = std::numeric_limits<long long>::min();
 
   for (const auto &move : moves) {
     _board[move.x][move.y] = player;
 
-    int val =
+    long long val =
         -negamax(depth - 1, -beta, -alpha, (player == ME) ? OPPONENT : ME);
 
     _board[move.x][move.y] = NONE;
@@ -216,7 +216,7 @@ int Gomoku::negamax(int depth, int alpha, int beta, Player player) {
   return bestValue;
 }
 
-int Gomoku::evaluate() {
+long long Gomoku::evaluate() {
   long long myScore = 0;
   long long opponentScore = 0;
 
@@ -275,6 +275,6 @@ int Gomoku::evaluate() {
       }
     }
   }
-  
-  return (int)(myScore - (opponentScore * 2));
+
+  return (long long)(myScore - (opponentScore * 2));
 }
