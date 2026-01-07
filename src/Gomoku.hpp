@@ -25,6 +25,8 @@ class Gomoku {
     void initializeBoard();
     void updateBoard(const Move &move, Player player);
 
+    int getLineStrength(int x, int y, Player p);
+
     bool isValid(const Move &move) const;
     bool isOnBoard(const Move &move) const;
 
