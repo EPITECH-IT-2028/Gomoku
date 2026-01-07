@@ -51,6 +51,46 @@ void Gomoku::updateBoard(const Move &move, Player player) {
   }
 }
 
+int Gomoku::getLineStrength(int x, int y, Player p) {
+    int maxStrength = 0;
+    const int dx[] = {1, 0, 1, 1};
+    const int dy[] = {0, 1, 1, -1};
+
+    for (int dir = 0; dir < 4; dir++) {
+        int count = 1;
+
+        int cx = x + dx[dir];
+        int cy = y + dy[dir];
+        while (cx >= 0 && cx < _width && cy >= 0 && cy < _height && _board[cx][cy] == p) {
+            count++;
+            cx += dx[dir];
+            cy += dy[dir];
+        }
+        int bx = x - dx[dir];
+        int by = y - dy[dir];
+        while (bx >= 0 && bx < _width && by >= 0 && by < _height && _board[bx][by] == p) {
+            count++;
+            bx -= dx[dir];
+            by -= dy[dir];
+        }
+
+        int openEnds = 0;
+        if (cx >= 0 && cx < _width && cy >= 0 && cy < _height && _board[cx][cy] == NONE) openEnds++;
+        if (bx >= 0 && bx < _width && by >= 0 && by < _height && _board[bx][by] == NONE) openEnds++;
+
+        if (count >= 5) return 100;
+        if (count == 4) {
+             if (openEnds >= 1) {
+                 if (maxStrength < 10) maxStrength = 10;
+             }
+        }
+        if (count == 3 && openEnds == 2) {
+             if (maxStrength < 5) maxStrength = 5;
+        }
+    }
+    return maxStrength;
+}
+
 Move Gomoku::getBestMove() {
   std::vector<Move> moves;
 
@@ -63,31 +103,8 @@ Move Gomoku::getBestMove() {
   moves = generateMoves();
 
   for (const auto& move : moves) {
-    _board[move.x][move.y] = ME;
-    
-    if (evaluate() >= 900000000) { 
-        _board[move.x][move.y] = NONE;
-        updateBoard(move, ME);
-        return move;
-    }
-    _board[move.x][move.y] = NONE;
-  }
-
-  for (const auto& move : moves) {
-    _board[move.x][move.y] = OPPONENT;
-
-    if (evaluate() < -800000000) { 
-        _board[move.x][move.y] = NONE;
-        updateBoard(move, ME);
-        return move;
-      }
-    _board[move.x][move.y] = NONE;
-  }
-
-  for (const auto& move : moves) {
       _board[move.x][move.y] = ME;
-
-      if (evaluate() >= 400000000) { 
+      if (getLineStrength(move.x, move.y, ME) >= 100) {
           _board[move.x][move.y] = NONE;
           updateBoard(move, ME);
           return move;
@@ -96,9 +113,28 @@ Move Gomoku::getBestMove() {
   }
 
   for (const auto& move : moves) {
-      _board[move.x][move.y] = ME;
+      _board[move.x][move.y] = OPPONENT;
+      if (getLineStrength(move.x, move.y, OPPONENT) >= 100) {
+          _board[move.x][move.y] = NONE;
+          updateBoard(move, ME);
+          return move;
+      }
+      _board[move.x][move.y] = NONE;
+  }
 
-      if (evaluate() >= 100000000) { 
+  for (const auto& move : moves) {
+      _board[move.x][move.y] = OPPONENT;
+      if (getLineStrength(move.x, move.y, OPPONENT) >= 10) {
+          _board[move.x][move.y] = NONE;
+          updateBoard(move, ME);
+          return move;
+      }
+      _board[move.x][move.y] = NONE;
+  }
+
+    for (const auto& move : moves) {
+      _board[move.x][move.y] = ME;
+      if (getLineStrength(move.x, move.y, ME) >= 10) {
           _board[move.x][move.y] = NONE;
           updateBoard(move, ME);
           return move;
@@ -202,6 +238,9 @@ long long Gomoku::negamax(int depth, long long alpha, long long beta, Player pla
 
     _board[move.x][move.y] = NONE;
 
+    if (val > 900000000) val -= 1;
+    else if (val < -900000000) val += 1;
+
     if (val >= bestValue) {
       bestValue = val;
     }
@@ -257,7 +296,7 @@ long long Gomoku::evaluate() {
           if (openEnds == 2) currentScore = 500000000;
           else if (openEnds == 1) {
               if (currentPlayer == ME) currentScore = 150000000;
-              else currentScore = 100000000;
+              else currentScore = 300000000;
           }
         } else if (count == 3) {
           if (openEnds == 2) {
@@ -276,5 +315,5 @@ long long Gomoku::evaluate() {
     }
   }
 
-  return (long long)(myScore - (opponentScore * 2));
+  return (myScore - (opponentScore * 2));
 }
