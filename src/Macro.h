@@ -2,6 +2,7 @@
 
 #define SUCCESS 0
 #define FAILURE -1
+#define MAX_DEPTH 6
 
 enum Player {
     NONE = 0,

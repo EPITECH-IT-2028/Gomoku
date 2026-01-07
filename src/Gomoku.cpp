@@ -2,6 +2,7 @@
 #include <limits>
 #include <vector>
 #include "Macro.h"
+#include <algorithm>
 
 int Gomoku::start(int size) {
   if (size <= 0) {
@@ -60,21 +61,75 @@ Move Gomoku::getBestMove() {
   }
 
   moves = generateMoves();
+
+  for (const auto& move : moves) {
+    _board[move.x][move.y] = ME;
+    
+    if (evaluate() >= 900000000) { 
+        _board[move.x][move.y] = NONE;
+        updateBoard(move, ME);
+        return move;
+    }
+    _board[move.x][move.y] = NONE;
+  }
+
+  for (const auto& move : moves) {
+    _board[move.x][move.y] = OPPONENT;
+
+    if (evaluate() < -800000000) { 
+        _board[move.x][move.y] = NONE;
+        updateBoard(move, ME);
+        return move;
+      }
+    _board[move.x][move.y] = NONE;
+  }
+
+  for (const auto& move : moves) {
+      _board[move.x][move.y] = ME;
+
+      if (evaluate() >= 400000000) { 
+          _board[move.x][move.y] = NONE;
+          updateBoard(move, ME);
+          return move;
+      }
+      _board[move.x][move.y] = NONE;
+  }
+
+  for (const auto& move : moves) {
+      _board[move.x][move.y] = ME;
+
+      if (evaluate() >= 100000000) { 
+          _board[move.x][move.y] = NONE;
+          updateBoard(move, ME);
+          return move;
+      }
+      _board[move.x][move.y] = NONE;
+  }
   
   if (moves.empty()) {
+    for (int x = 0; x < _width; ++x) {
+        for (int y = 0; y < _height; ++y) {
+            if (_board[x][y] == NONE) {
+                Move fallback = {x, y};
+                updateBoard(fallback, ME);
+                return fallback;
+            }
+        }
+    }
     return {-1, -1};
   }
 
   Move bestMove = moves[0];
-  int bestValue = std::numeric_limits<int>::min();
-  int alpha = std::numeric_limits<int>::min();
-  int beta = std::numeric_limits<int>::max();
-  int maxDepth = 3;
+  long long bestValue = std::numeric_limits<long long>::min();
+  long long alpha = std::numeric_limits<long long>::min();
+  long long beta = std::numeric_limits<long long>::max();
 
   for (const auto &move : moves) {
     _board[move.x][move.y] = ME;
 
-    int val = -negamax(maxDepth - 1, -beta, -alpha, OPPONENT);
+    long long val = -negamax(MAX_DEPTH - 1, -beta, -alpha, OPPONENT);
+
+    _board[move.x][move.y] = NONE;
 
     if (val > bestValue) {
       bestValue = val;
@@ -94,51 +149,60 @@ std::vector<Move> Gomoku::generateMoves() {
 
   for (int x = 0; x < _width; x++) {
     for (int y = 0; y < _height; y++) {
-      if (_board[x][y] == NONE)
-        continue;
+      
+      if (_board[x][y] != NONE) continue;
 
       bool hasNeighbor = false;
+      
       for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
-          if (dx == 0 && dy == 0)
-            continue;
-          if (isOnBoard({x + dx, y + dy}) && _board[y + dy][x + dx] != NONE) {
+          if (dx == 0 && dy == 0) continue;
+
+          if (isOnBoard({x + dx, y + dy}) && _board[x + dx][y + dy] != NONE) {
             hasNeighbor = true;
             break;
           }
         }
-        if (hasNeighbor)
-          break;
+        if (hasNeighbor) break;
       }
+
       if (hasNeighbor) {
         moves.push_back({x, y});
       }
     }
   }
 
+  Move center = {_width / 2, _height / 2};
+  std::sort(moves.begin(), moves.end(), [center](const Move& a, const Move& b) {
+      int distA = (a.x - center.x)*(a.x - center.x) + (a.y - center.y)*(a.y - center.y);
+      int distB = (b.x - center.x)*(b.x - center.x) + (b.y - center.y)*(b.y - center.y);
+      return distA < distB;
+  });
+
   return moves;
 }
 
-int Gomoku::negamax(int depth, int alpha, int beta, Player player) {
+long long Gomoku::negamax(int depth, long long alpha, long long beta, Player player) {
   if (depth == 0) {
-    return (player == ME) ? evaluate() : -evaluate();
+    long long score = evaluate();
+    return (player == ME) ? score : -score;
   }
 
   std::vector<Move> moves = generateMoves();
   if (moves.empty())
     return (player == ME) ? evaluate() : -evaluate();
 
-  int bestValue = std::numeric_limits<int>::min();
+  long long bestValue = std::numeric_limits<long long>::min();
 
   for (const auto &move : moves) {
     _board[move.x][move.y] = player;
 
-    int val =
+    long long val =
         -negamax(depth - 1, -beta, -alpha, (player == ME) ? OPPONENT : ME);
 
     _board[move.x][move.y] = NONE;
 
-    if (val > bestValue) {
+    if (val >= bestValue) {
       bestValue = val;
     }
     if (val > alpha) {
@@ -152,53 +216,65 @@ int Gomoku::negamax(int depth, int alpha, int beta, Player player) {
   return bestValue;
 }
 
-int Gomoku::evaluate() {
-  int score = 0;
+long long Gomoku::evaluate() {
+  long long myScore = 0;
+  long long opponentScore = 0;
 
   const int dx[] = {1, 0, 1, 1};
   const int dy[] = {0, 1, 1, -1};
 
   for (int x = 0; x < _width; x++) {
     for (int y = 0; y < _height; y++) {
-      if (_board[x][y] == NONE)
-        continue;
+      if (_board[x][y] == NONE) continue;
 
       Player currentPlayer = _board[x][y];
-
-      int multiplicator = (currentPlayer == ME) ? 1 : -1;
 
       for (int dir = 0; dir < 4; dir++) {
         int prevX = x - dx[dir];
         int prevY = y - dy[dir];
 
-        if (isOnBoard({prevX, prevY}) &&
-            _board[prevX][prevY] == currentPlayer) {
-          continue;
-        }
+        if (isOnBoard({prevX, prevY}) && _board[prevX][prevY] == currentPlayer) continue;
 
         int count = 0;
         int currX = x;
         int currY = y;
 
-        while (isOnBoard({currX, currY}) &&
-               _board[currX][currY] == currentPlayer) {
+        while (isOnBoard({currX, currY}) && _board[currX][currY] == currentPlayer) {
           count++;
           currX += dx[dir];
           currY += dy[dir];
         }
 
+        int openEnds = 0;
+        if (isOnBoard({prevX, prevY}) && _board[prevX][prevY] == NONE) openEnds++;
+        if (isOnBoard({currX, currY}) && _board[currX][currY] == NONE) openEnds++;
+
+        long long currentScore = 0;
+
         if (count >= 5) {
-          score += 10000 * multiplicator;
+          currentScore = 1000000000;
         } else if (count == 4) {
-          score += 1000 * multiplicator;
+          if (openEnds == 2) currentScore = 500000000;
+          else if (openEnds == 1) {
+              if (currentPlayer == ME) currentScore = 150000000;
+              else currentScore = 100000000;
+          }
         } else if (count == 3) {
-          score += 100 * multiplicator;
+          if (openEnds == 2) {
+              if (currentPlayer == ME) currentScore = 200000000;
+              else currentScore = 80000000;
+          }
+          else if (openEnds == 1) currentScore = 10000;
         } else if (count == 2) {
-          score += 10 * multiplicator;
+          if (openEnds == 2) currentScore = 500;
+          else if (openEnds == 1) currentScore = 50;
         }
+
+        if (currentPlayer == ME) myScore += currentScore;
+        else opponentScore += currentScore;
       }
     }
   }
 
-  return score;
+  return (long long)(myScore - (opponentScore * 2));
 }

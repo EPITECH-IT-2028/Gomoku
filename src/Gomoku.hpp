@@ -29,8 +29,8 @@ class Gomoku {
     bool isOnBoard(const Move &move) const;
 
     Move getBestMove();
-    int evaluate();
-    int negamax(int depth, int alpha, int beta, Player player);
+    long long evaluate();
+    long long negamax(int depth, long long alpha, long long beta, Player player);
     std::vector<Move> generateMoves();
 
     void setWidth(int width) {
