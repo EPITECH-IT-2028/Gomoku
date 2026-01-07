@@ -149,6 +149,12 @@ void Commands::handleBoard(const std::string &args) {
   std::string line;
 
   while (_running && std::getline(std::cin, line)) {
+    const size_t end = line.find_last_not_of(" \n\r\t");
+    if (end != std::string::npos) {
+      line.erase(end + 1);
+    } else {
+      line.clear();
+    }
     if (line == "DONE") {
       Move move = _game.getBestMove();
       std::cout << move.x << "," << move.y << std::endl;
